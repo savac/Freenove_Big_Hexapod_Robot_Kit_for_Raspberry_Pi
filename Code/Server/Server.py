@@ -18,6 +18,7 @@ from Control import *
 from ADC import *
 from Ultrasonic import *
 from Command import COMMAND as cmd
+from utils import retry
 
 class StreamingOutput(io.BufferedIOBase):
     def __init__(self):
@@ -39,6 +40,8 @@ class Server:
         self.control=Control()
         self.sonic=Ultrasonic()
         self.control.Thread_conditiona.start()
+
+    @retry(exception=OSError, n_tries=10, delay=5, logger=True)
     def get_interface_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         return socket.inet_ntoa(fcntl.ioctl(s.fileno(),
